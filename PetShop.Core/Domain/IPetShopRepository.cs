@@ -12,7 +12,5 @@ namespace PetShop.Core.Domain
        public Pet FindPetById(int id);
        public void DeletePet(int id);
        public Pet UpdatePet(Pet updatepet);
-       
-
    }
 }

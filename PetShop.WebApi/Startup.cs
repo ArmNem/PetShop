@@ -13,6 +13,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PetShop.Core.ApplicationService;
 using PetShop.Core.Domain;
+using PetShop.Core.Entity;
 
 namespace PetShop.WebApi
 {
@@ -30,6 +31,8 @@ namespace PetShop.WebApi
         {
             services.AddScoped<IPetShopRepository, PetShopRepository>();
             services.AddScoped<IPetShopService, PetShopService>();
+            services.AddScoped<IOwnerRepository, OwnerRepository>();
+            services.AddScoped<IOwnerService, OwnerService>();
             services.AddControllers();
         }
 
@@ -38,7 +41,30 @@ namespace PetShop.WebApi
         {
             if (env.IsDevelopment())
             {
+
                 app.UseDeveloperExceptionPage();
+                using (var scope = app.ApplicationServices.CreateScope())
+                {
+                    var repo = scope.ServiceProvider.GetService<IPetShopRepository>();
+                    repo.AddPet(new Pet()
+                    {
+                       
+                        Name = "Rex",
+                        Type = "Dog",
+                        BirthDate = DateTime.Now.AddYears(-3),
+                        SoldDate = DateTime.Now.AddYears(-2),
+                        Color = "Black",
+                        PrevOwner = "Johhny",
+                        Price = 3000
+                    });
+                    var repo2 = scope.ServiceProvider.GetService<IOwnerRepository>();
+                    repo2.AddOwner(new Owner()
+                    {
+
+                        Name = "Rex",
+                       
+                    });
+                }
             }
 
             app.UseHttpsRedirection();
