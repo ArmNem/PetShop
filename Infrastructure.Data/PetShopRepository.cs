@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using PetShop.Core.Domain;
 using PetShop.Core.Entity;
@@ -10,48 +11,6 @@ namespace Infrastructure.Data
     {
         private static int _id = 1;
         private static List<Pet> pets = new List<Pet>();
-
-       
-
-        public void InitData()
-        {
-            pets.Add(new Pet()
-                {
-                    Id = _id++,
-                    Name = "Rex",
-                    Type = "Dog",
-                    BirthDate = DateTime.Now.AddYears(-3),
-                    SoldDate = DateTime.Now.AddYears(-2),
-                    Color = "Black",
-                    PrevOwner = "Johhny",
-                    Price = 3000
-                }
-            );
-            pets.Add(new Pet()
-                {
-                    Id = _id++,
-                    Name = "Mobo",
-                    Type = "Chipmunk",
-                    BirthDate = DateTime.Now.AddYears(-1),
-                    SoldDate = DateTime.Now.AddMonths(-4),
-                    Color = "Light Brown",
-                    PrevOwner = "Chuck",
-                    Price = 1500
-                }
-            );
-            pets.Add(new Pet()
-                {
-                    Id = _id++,
-                    Name = "Luka",
-                    Type = "Cat",
-                    BirthDate = DateTime.Now.AddYears(-2),
-                    SoldDate = DateTime.Now.AddYears(-1),
-                    Color = "Grey",
-                    PrevOwner = "Ben",
-                    Price = 2000
-                }
-            );
-        }
 
         public IEnumerable<Pet> GetPets()
         {
@@ -66,15 +25,15 @@ namespace Infrastructure.Data
         }
 
         
-        public void DeletePet(int id)
+        public Pet DeletePet(int id)
         {
             var petfound = FindPetById(id);
-            if (petfound != null)
+            if (petfound == null)
             {
-                 pets.Remove(petfound);
+                return null;
             }
-
-            
+            pets.Remove(petfound);
+            return petfound;
         }
 
         public Pet UpdatePet(Pet updatepet)
@@ -87,7 +46,7 @@ namespace Infrastructure.Data
                 petFromDB.BirthDate = updatepet.BirthDate;
                 petFromDB.SoldDate = updatepet.SoldDate;
                 petFromDB.Color = updatepet.Color;
-                petFromDB.PrevOwner = updatepet.PrevOwner;
+                petFromDB.Owner = updatepet.Owner;
                 petFromDB.Price = updatepet.Price;
                 return petFromDB;
             }
@@ -97,12 +56,70 @@ namespace Infrastructure.Data
 
         public Pet FindPetById(int id)
         {
-            foreach (var pet in pets)
+            /*return pets.Select(c => new Pet()
+                 {
+                     Id = c.Id,
+                     Name = c.Name,
+                     Type = c.Type,
+                     BirthDate = c.BirthDate,
+                     SoldDate = c.SoldDate,
+                     Color = c.Color,
+                     Owner = c.Owner,
+                     Price = c.Price
+                 }
+             ).FirstOrDefault(c => c.Id == id);*/
+            foreach (var owner in pets)
             {
-                if (pet.Id == id)
-                    return pet;
+                if (owner.Id == id)
+                    return owner;
             }
             return null;
+        }
+        public FilteredList<Pet> ReadAll(Filter filter)
+        {
+            var filteredList = new FilteredList<Pet>();
+
+            filteredList.TotalCount = pets.Count;
+            filteredList.FilterUsed = filter;
+
+            IEnumerable<Pet> filtering = pets;
+
+            if (!string.IsNullOrEmpty(filter.SearchText))
+            {
+                switch (filter.SearchField)
+                {
+                    case "Name":
+                        filtering = filtering.Where(c => c.Name.Contains(filter.SearchText));
+                        break;
+                    case "Color":
+                        filtering = filtering.Where(c => c.Color.Contains(filter.SearchText));
+                        break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(filter.OrderDirection) && !string.IsNullOrEmpty(filter.OrderProperty))
+            {
+                var prop = typeof(Pet).GetProperty(filter.OrderProperty);
+                filtering = "ASC".Equals(filter.OrderDirection) ?
+                    filtering.OrderBy(c => prop.GetValue(c, null)) :
+                    filtering.OrderByDescending(c => prop.GetValue(c, null));
+
+            }
+
+            filteredList.List = filtering.ToList();
+            return filteredList;
+        }
+        public List<Pet> Filter(string orderDir)
+        {
+            if ("asc".Equals(orderDir))
+            {
+                return pets
+                    .OrderBy(c => c.Name)
+                    .ToList();
+            }
+            return pets
+                .OrderByDescending(c => c.Name)
+                .ToList();
         }
     }
 }

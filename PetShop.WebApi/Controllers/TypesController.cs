@@ -12,80 +12,76 @@ namespace PetShop.WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class OwnersController : ControllerBase
+    public class TypesController : ControllerBase
     {
-        private IOwnerService _ownerService;
+        private IPetTypeService _petTypeService;
 
-        public OwnersController(IOwnerService ownerService)
+        public TypesController(IPetTypeService petTypeService)
         {
-            _ownerService = ownerService;
+            _petTypeService = petTypeService;
         }
-        // GET: api/<OwnersController>
+        // GET: api/<TypesController>
         [HttpGet]
-        public ActionResult<IEnumerable<Owner>> Get()
+        public ActionResult<IEnumerable<Pettype>> Get()
         {
-            return _ownerService.GetAllOwners();
+            return _petTypeService.GetAllTypes();
         }
 
-        // GET api/<OwnersController>/5
+        // GET api/<TypesController>/5
         [HttpGet("{id}")]
-        public ActionResult<Owner> Get(int id)
+        public ActionResult<Pettype> Get(int id)
         {
             try
             {
-                return StatusCode(200,_ownerService.FindOwnerById(id));
+                return StatusCode(200,_petTypeService.FindTypeById(id));
             }
             catch (Exception e)
             {
                 return StatusCode(500,e.Message);
             }
-            
         }
 
-        // POST api/<OwnersController>
+        // POST api/<TypesController>
         [HttpPost]
-        public ActionResult<Owner> Post([FromBody] Owner owner)
+        public ActionResult<Pettype> Post([FromBody] Pettype type)
         {
+
             try
             {
-                return StatusCode(201,_ownerService.CreateOwner(owner));
+                return StatusCode(201,_petTypeService.CreateType(type));
             }
             catch (Exception e)
             {
                 return StatusCode(500,e.Message);
             }
-           
         }
 
-        // PUT api/<OwnersController>/5
+        // PUT api/<TypesController>/5
         [HttpPut("{id}")]
-        public ActionResult<Owner> Put(int id, [FromBody] Owner owner)
+        public ActionResult<Pettype> Put(int id, [FromBody] Pettype type)
         {
             try
             {
-                return StatusCode(202,_ownerService.UpdateOwner(owner));
+                return StatusCode(202,_petTypeService.UpdateType(type));
             }
             catch (Exception e)
             {
                 return StatusCode(500,e.Message);
             }
-              
-            
         }
 
-        // DELETE api/<OwnersController>/5
+        // DELETE api/<TypesController>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
             try
             {
-                _ownerService.DeleteOwner(id);
+                _petTypeService.DeleteType(id);
             }
             catch (Exception e)
             {
-                BadRequest(e.Message);
+                StatusCode(500,e.Message);
             }
-            
         }
     }
 }

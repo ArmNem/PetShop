@@ -10,7 +10,9 @@ namespace PetShop.Core.Domain
        public IEnumerable<Pet> GetPets();
        public Pet AddPet(Pet pet);
        public Pet FindPetById(int id);
-       public void DeletePet(int id);
+       public Pet DeletePet(int id);
        public Pet UpdatePet(Pet updatepet);
-   }
+       List<Pet> Filter(string orderDir);
+       FilteredList<Pet> ReadAll(Filter filter);
+    }
 }

@@ -9,10 +9,10 @@ namespace PetShop.UI
     {
         static void Main(string[] args)
         {
-            IPetShopRepository repo = new PetShopRepository();
+           /* IPetShopRepository repo = new PetShopRepository();
             ((PetShopRepository)repo).InitData();
             IPetShopService petservice = new PetShopService(repo);
-            var printer = new Printer(petservice);
+            var printer = new Printer(petservice);*/
             //var selection = printer.ShowMenu();
             /*while (selection != 8)
             {
